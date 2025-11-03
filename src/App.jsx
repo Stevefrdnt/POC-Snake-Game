@@ -60,12 +60,17 @@ function App() {
 
       // Check if food is eaten
       if (newHead.x === food.x && newHead.y === food.y) {
-        const newScore = score + 10
-        setScore(newScore)
-        if (newScore > highScore) {
-          setHighScore(newScore)
-          localStorage.setItem('snakeHighScore', newScore.toString())
-        }
+        setScore(prevScore => {
+          const newScore = prevScore + 10
+          setHighScore(prevHighScore => {
+            if (newScore > prevHighScore) {
+              localStorage.setItem('snakeHighScore', newScore.toString())
+              return newScore
+            }
+            return prevHighScore
+          })
+          return newScore
+        })
         setFood(generateFood(newSnake))
       } else {
         newSnake.pop()
@@ -73,7 +78,7 @@ function App() {
 
       return newSnake
     })
-  }, [food, score, highScore, checkCollision, generateFood])
+  }, [food, checkCollision, generateFood])
 
   // Handle keyboard input
   const handleKeyPress = useCallback((e) => {
